@@ -27,7 +27,7 @@ public class ConvolutionBW implements ImageFilter {
 
 				for (int i = 0; i < mask.length; i++) {
 				   for (int j = 0; j < mask.length; j++) {
-					   if(row + i - 1 < 0 || col + j - 1 < 0 || row + i > mask.length || col + j > mask.length){
+					   if(row + i - 1 < 0 || col + j - 1 < 0 || row + i > height || col + j > width){
 						   continue;
 					   }
 				       sum += im[row+i - 1][col+j - 1]*mask[i][j];
@@ -35,12 +35,13 @@ public class ConvolutionBW implements ImageFilter {
 				   }
 				}
 				sum += 127;
-				newImage[row][col] = (short) (im[row][col] + sum);
-				if(newImage[row][col] > 255){
-					newImage[row][col] = 255;
-				}else if(newImage[row][col] < 0){
-					newImage[row][col] = 0;
+				
+				if(sum > 255){
+					sum = 255;
+				}else if(sum < 0){
+					sum = 0;
 				}
+				newImage[row][col] = (short) (sum);
 			}
 		}
 
