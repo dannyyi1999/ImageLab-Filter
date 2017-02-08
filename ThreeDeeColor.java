@@ -1,4 +1,6 @@
 package filters;
+import javax.swing.JOptionPane;
+
 import imagelab.*;
 
 public class ThreeDeeColor implements ImageFilter {
@@ -24,6 +26,7 @@ public class ThreeDeeColor implements ImageFilter {
 			a[0][2] would be the value of the item in row 0 and column 2 which is 153
 			a[3][1] = a[2][0] would change the value of a[3][1] from 255 to 55 because a[2][0] is 55
 		*/
+		int offset = Integer.parseInt(JOptionPane.showInputDialog("Enter the amount of offset: "));
 		int height = oR.length; // height is the number of rows which is the length of the outer array
 		int width = oR[0].length; // width is the number of columns which is the length of each inner array
 		
@@ -34,12 +37,19 @@ public class ThreeDeeColor implements ImageFilter {
 		
 		for (int row = 0; row < height; row++) { // loop through all the rows
 		    for (int col = 0; col < width; col++) { // for each row, loop through all the columns
-		    	// This simply sets each color for each pixel to the original color at that pixel
-		    	// so the filtered image will be the same as the original
-		        nR[row][col] = (short) (oR[row][col] + 20);
+		    	if(col + offset < width){
+			        nR[row][col] = (short) (oR[row][col + offset]);
+		    	}else {
+		    		nR[row][col] = oR[row][col];
+		    	}
 		        nG[row][col] = oG[row][col];
-		        nB[row][col] = (short) (oB[row][col] - 20);
+		        if(col - offset >= 0){
+			        nB[row][col] = (short) (oB[row][col - offset]);
+		        }else {
+		        	nB[row][col] = oB[row][col];
+		        }
 		        nA[row][col] = oA[row][col];
+		        
 		    }
 		}
 		
