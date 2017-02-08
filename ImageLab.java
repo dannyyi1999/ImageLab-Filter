@@ -141,23 +141,23 @@ public class ImageLab {
     
     private class MyActionListener implements ActionListener {
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
+		public void actionPerformed(ActionEvent e) {
 			FileDialog fd = new FileDialog(new Frame(), "Create a Color database", FileDialog.SAVE);
 			fd.setVisible(true);
 			FileWriter file;
-			int numCol = Integer.parseInt(JOptionPane.showInputDialog(fd.getDirectory() + fd.getFile()));
+			int numCol = Integer.parseInt(JOptionPane.showInputDialog("Enter the number of colors: "));
 			try {
-				file = new FileWriter("test.txt");
+				file = new FileWriter(fd.getDirectory() + fd.getFile());
 				for(int i = 0; i < numCol; i++){
 					for(int j = 0; j < 3; j++){
 						file.write((int)(Math.random() * 256) + "  ");
 					}
-					file.write("\n");
+					file.write("\r\n");
 				}
-			} catch (IOException e) {
+				file.close();
+			} catch (IOException e1) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e1.printStackTrace();
 			}
 		}
     	
