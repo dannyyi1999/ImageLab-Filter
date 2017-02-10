@@ -1,6 +1,8 @@
 package filters;
 import java.awt.FileDialog;
 import java.awt.Frame;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -40,9 +42,14 @@ public class P4_Yi_Danny_PhotomosaicFilterColor implements ImageFilter {
 		
 		FileDialog fd = new FileDialog(new Frame(), "Select a Color database", FileDialog.LOAD);
 		fd.setVisible(true);
-		in = new Scanner(fd.getDirectory() + fd.getFile());
-		while(in.hasNext()){
-			database.add(new ColorInfo(in.nextInt(), in.nextInt(), in.nextInt()));
+		try {
+			in = new Scanner(new File(fd.getDirectory() + fd.getFile()));
+			while(in.hasNext()){
+				database.add(new ColorInfo(Integer.parseInt(in.next()), Integer.parseInt(in.next()), Integer.parseInt(in.next())));
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		int diameter = Integer.parseInt(JOptionPane.showInputDialog("Please enter the pixel diameter ranging from 1 - 40"));
 		while(diameter > 40 || diameter < 0){
@@ -152,11 +159,3 @@ class ColorInfo {
 	}
 	
 }
-
-
-
-
-
-
-
-
