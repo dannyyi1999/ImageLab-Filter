@@ -1,8 +1,10 @@
 package filters;
 import java.awt.FileDialog;
 import java.awt.Frame;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -65,33 +67,37 @@ public class P4_Yi_Danny_PhotomosaicFilterColor implements ImageFilter {
 		short[][] nB = new short[mosHeight][mosWidth]; // declare a new array of blue values of size height rows x width columns
 		short[][] nA = new short[mosHeight][mosWidth]; // declare a new array of alpha values of size height rows x width columns
 		
-		int aveRed = 0;
-		int aveGreen = 0;
-		int aveBlue = 0;
+
 		
 		for (int row = 0; row < height / diameter; row++) { // loop through all the rows
 		    for (int col = 0; col < width / diameter; col++) { // for each row, loop through all the columns
 		    	// This simply sets each color for each pixel to the original color at that pixel
 		    	// so the filtered image will be the same as the original
+				double aveRed = 0;
+				double aveGreen = 0;
+				double aveBlue = 0;
+				double aveAlpha = 0;
 		    	for(int i = 0; i < diameter; i++){
 		    		for(int j = 0; j < diameter; j++){
 		    			aveRed += oR[row * diameter + i][col * diameter + j];
-		    			aveGreen += oR[row * diameter + i][col * diameter + j];
-		    			aveBlue += oR[row * diameter + i][col * diameter + j];
+		    			aveGreen += oG[row * diameter + i][col * diameter + j];
+		    			aveBlue += oB[row * diameter + i][col * diameter + j];
+		    			aveAlpha += oA[row * diameter + i][col * diameter + j];
 		    		}
 		    	}
-		    	aveRed /= diameter;
-		    	aveGreen /= diameter;
-		    	aveBlue /= diameter;
-		    	int distance = (int) Math.sqrt(Math.pow(aveRed - database.get(0).getRed(), 2) +
+		    	aveRed /= diameter * diameter;
+		    	aveGreen /= diameter* diameter;
+		    	aveBlue /= diameter* diameter;
+		    	aveAlpha /= diameter* diameter;
+		    	double distance =  Math.sqrt(Math.pow(aveRed - database.get(0).getRed(), 2) +
 		    			Math.pow(aveGreen - database.get(0).getGreen(), 2) + 
 		    			Math.pow(aveBlue - database.get(0).getBlue(), 2));
 		    	int small = 0;
 		    	for(int x = 1; x < database.size(); x++){
-		    		if(distance > (int) Math.sqrt(Math.pow(aveRed - database.get(x).getRed(), 2) +
+		    		if(distance > Math.sqrt(Math.pow(aveRed - database.get(x).getRed(), 2) +
 		    			Math.pow(aveGreen - database.get(x).getGreen(), 2) + 
 		    			Math.pow(aveBlue - database.get(x).getBlue(), 2))){
-		    			distance = (int) Math.sqrt(Math.pow(aveRed - database.get(x).getRed(), 2) +
+		    			distance =  Math.sqrt(Math.pow(aveRed - database.get(x).getRed(), 2) +
 				    			Math.pow(aveGreen - database.get(x).getGreen(), 2) + 
 				    			Math.pow(aveBlue - database.get(x).getBlue(), 2));
 		    			small = x;
@@ -103,7 +109,7 @@ public class P4_Yi_Danny_PhotomosaicFilterColor implements ImageFilter {
 		    			nR[row * 40 + i][col * 40 + a] = (short) database.get(small).getRed();
 		    			nG[row * 40 + i][col * 40 + a] = (short) database.get(small).getGreen();
 		    			nB[row * 40 + i][col * 40 + a] = (short) database.get(small).getBlue();
-		    			nA[row * 40 + i][col * 40 + a] = (short) database.get(small).getRed();
+		    			nA[row * 40 + i][col * 40 + a] = (short) aveAlpha;
 		    		}
 		    	}
 		    }
@@ -111,7 +117,33 @@ public class P4_Yi_Danny_PhotomosaicFilterColor implements ImageFilter {
 		
 		filteredImage = new ImgProvider(); // initialize a new ImgProvider object
 		filteredImage.setColors(nR, nG, nB, nA); // create the image from the arrays of new color values
-		filteredImage.showPix("Color Template"); // display the image on screen with the given title
+		int screenWidth = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+		int screenHeight = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+
+		// If photomosaic image is too large to fit on the screen, prompt to save the image
+		if (mosWidth > screenWidth || mosHeight > screenHeight) {
+			try {
+	FileDialog fd2;
+				fd2 = new FileDialog(new Frame(), "Save your photomosaic", FileDialog.SAVE);
+				fd2.setVisible(true);
+				String theFile = fd.getFile();
+				String theDir = fd.getDirectory();
+				filteredImage.save(new File(theDir + theFile));
+			}
+			catch (IOException io) {
+				System.out.println(io.getMessage());
+			}
+		}
+
+		// Try to display the image
+		try {
+			filteredImage.showPix("Photomosaic from Color DB");
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
+		
 	}
 
 	public ImgProvider getImgProvider() {
