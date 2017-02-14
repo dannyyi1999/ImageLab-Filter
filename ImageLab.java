@@ -142,22 +142,26 @@ public class ImageLab {
     private class MyActionListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			FileDialog fd = new FileDialog(new Frame(), "Create a Color database", FileDialog.SAVE);
-			fd.setVisible(true);
-			FileWriter file;
-			int numCol = Integer.parseInt(JOptionPane.showInputDialog("Enter the number of colors: "));
-			try {
-				file = new FileWriter(fd.getDirectory() + fd.getFile());
-				for(int i = 0; i < numCol; i++){
-					for(int j = 0; j < 3; j++){
-						file.write((int)(Math.random() * 256) + "  ");
+			if(e.getActionCommand().equals("Create Color DataBase")){
+				FileDialog fd = new FileDialog(new Frame(), "Create a Color database", FileDialog.SAVE);
+				fd.setVisible(true);
+				FileWriter file;
+				int numCol = Integer.parseInt(JOptionPane.showInputDialog("Enter the number of colors: "));
+				try {
+					file = new FileWriter(fd.getDirectory() + fd.getFile());
+					for(int i = 0; i < numCol; i++){
+						for(int j = 0; j < 3; j++){
+							file.write((int)(Math.random() * 256) + " ");
+						}
+						file.write("\r\n");
 					}
-					file.write("\r\n");
+					file.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
-				file.close();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			}else if(e.getActionCommand().equals()){
+				
 			}
 		}
     	
