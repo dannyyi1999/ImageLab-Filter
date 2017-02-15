@@ -7,6 +7,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 
+import java.util.ArrayList;
 import java.util.Vector;
 import java.io.*;
 
@@ -81,10 +82,13 @@ public class ImageLab {
             
         JMenu photomosaicMenu = new JMenu("Photomosaic");
         JMenuItem item1 = new JMenuItem("Create Color DataBase");
+        JMenuItem item2 = new JMenuItem("Create an Image database");
         mbar.add(photomosaicMenu);
         photomosaicMenu.add(item1);
+        photomosaicMenu.add(item2);
         MyActionListener bob = new MyActionListener();
         item1.addActionListener(bob);
+        item2.addActionListener(bob);
 
         JMenu filter = new JMenu("Filter");
         mbar.add(filter);
@@ -160,11 +164,71 @@ public class ImageLab {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-			}else if(e.getActionCommand().equals()){
+			}else if(e.getActionCommand().equals("Create an Image database")){
+				FileDialog fd = new FileDialog(new Frame(), "Create an Image database", FileDialog.SAVE);
+				fd.setVisible(true);
+				JFileChooser fc = new JFileChooser();
+				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				fc.setDialogTitle("Select a folder of images");
+				fc.setApproveButtonText("Ok");
+				fc.showOpenDialog(null);
+				// The next line will contain the folder path the user selected
+				File imageFolder = new File(fc.getSelectedFile().getPath());
+				ArrayList <File> files = findImageFiles(imageFolder);
+				
+				try {
+					FileWriter file = new FileWriter(fd.getDirectory() + fd.getFile());
+					for(int i = 0; i < files.size(); i++){
+						ImgProvider img = new ImgProvider(files.get(i).getPath());
+						img.readinImage();
+
+						file.write((int)(average(img.getRed())) + " ");
+						file.write((int)(average(img.getGreen())) + " ");
+						file.write((int)(average(img.getBlue())) + " ");
+						file.write(files.get(i).getPath());
+						file.write("\r\n");
+						
+					}
+					
+					file.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+					
+					
 				
 			}
 		}
     	
+    }
+    
+    private ArrayList<File> findImageFiles(File directory) {
+		ArrayList<File> files = new ArrayList<File>();
+	if (!directory.exists()) {
+			return files;
+		}
+	File[] allFiles = directory.listFiles();
+		for (File file : allFiles) {
+			if (file.getName().toLowerCase().endsWith(".jpg") ||
+				file.getName().toLowerCase().endsWith(".png") ||
+				file.getName().toLowerCase().endsWith(".bmp") ||
+				file.getName().toLowerCase().endsWith(".gif")) {
+					files.add(file);
+			}
+		}
+		return files;
+	}
+    
+    private int average(short[][] list){
+    	double average = 0;
+    	for(int i = 0; i < list.length; i++){
+    		for(int j = 0; j < list[i].length; j++){
+    			average += list[i][j];
+    		}
+    	}
+    	return (int) (average / list.length / list[0].length);
     }
 
     /** Builds a dedicated actionListener for the specific ImageFilter passed in. */
@@ -266,4 +330,13 @@ public class ImageLab {
         }
         images.remove(ip);
     }
+    
+    
 }
+
+
+
+
+
+
+
